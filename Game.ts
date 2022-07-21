@@ -3,40 +3,45 @@ import {Canvas} from "./Engine";
 type system = (game: Game) => void
 
 export class Game  {
-    systems: Array<system>;
-    lastRenderTime: number;
+    private _systems: Array<system>;
+    private _lastRenderTime: number;
 
+    /**
+     * 
+     */
     constructor() {
-        this.systems = [];
-        this.lastRenderTime = 0;
+        this._systems = [];
+        this._lastRenderTime = 0;
     }
 
     createDefaultRenderSystem(canvasElement: HTMLCanvasElement, width: number, height: number) {
         const canvas = new Canvas(canvasElement, width, height);
-        this.systems.push((game: Game) => {
+        this._systems.push((game: Game) => {
             canvas.clear("blue");
             console.log("render");
         });
     }
 
     addSystem(system: system){
-        this.systems.push(system);
+        this._systems.push(system);
     }
-
-    private loop(timestamp){
-        let deltaTime: number = timestamp - this.lastRenderTime;
-
-        this.systems.forEach(fn => {
+    
+    private onNewFrame = (deltaTime: number) => {
+        
+        this._systems.forEach(fn => {
             fn(this);
         });
 
-        this.lastRenderTime = timestamp;
-        requestAnimationFrame((timestamp)=>this.loop(timestamp/1000));
-
     }
-
-
+    
     init() {
-        requestAnimationFrame((timestamp)=>this.loop(timestamp/1000));
+        const handleTick = (time: number) => {
+            let deltaTime: number = time- this._lastRenderTime;
+
+
+            this._lastRenderTime = time;
+            requestAnimationFrame(handleTick);
+        }
+        requestAnimationFrame(handleTick);
     }
 }
