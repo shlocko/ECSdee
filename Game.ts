@@ -37,9 +37,10 @@ export class Game  {
     init() {
         const handleTick = (time: number) => {
             let deltaTime: number = time- this._lastRenderTime;
-
-
             this._lastRenderTime = time;
+            
+            this.onNewFrame(deltaTime);
+            
             requestAnimationFrame(handleTick);
         }
         requestAnimationFrame(handleTick);
